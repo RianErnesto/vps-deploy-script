@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-export function processTemplate(templatePath, variables) {
+function processTemplate(templatePath, variables) {
   let template = fs.readFileSync(templatePath, "utf8");
 
   // Replace all variables in the template
@@ -11,3 +11,7 @@ export function processTemplate(templatePath, variables) {
 
   return template;
 }
+
+module.exports = {
+  processTemplate,
+};

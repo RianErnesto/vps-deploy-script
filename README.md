@@ -11,6 +11,7 @@ This script automates the process of configuring Nginx on a remote server for re
 - Automatic Nginx configuration testing and restart
 - Support for both HTTP and HTTPS (port 80)
 - Template-based configuration for easy customization
+- GitHub repository secrets management using libsodium-wrappers for secure encryption
 
 ## Prerequisites
 
@@ -19,6 +20,7 @@ This script automates the process of configuring Nginx on a remote server for re
 - Nginx installed on the target server
 - Sudo privileges on the target server
 - SSH private key for authentication
+- GitHub Personal Access Token (for secrets management)
 
 ## Installation
 
@@ -48,20 +50,31 @@ SERVER_IP_ADDRESS="your_server_ip"
 USER_SSH="your_ssh_username"
 SSH_PRIVATE_KEY="your_private_key_name"
 # Optional: SSH_PASSPHRASE="your_key_passphrase"
+# Optional: GITHUB_TOKEN="your_github_personal_access_token"
 ```
 
 Make sure your SSH private key is located in the `~/.ssh/` directory.
 
+## Dependencies
+
+The project uses the following main dependencies:
+
+- `libsodium-wrappers`: For secure encryption of GitHub secrets
+- `ssh2`: For SSH connection handling
+- `readline`: For interactive command-line interface
+- `zod`: For environment variable validation
+
 ## Usage
+
+### Nginx Configuration
 
 1. Run the script using npm:
 
 ```bash
-npm start
+npm run nginx
 ```
 
 2. Follow the interactive prompts:
-   - Confirm server access
    - Enter client name (used for the configuration filename)
    - Enter domain name
    - Enter port number where your application is running
@@ -73,6 +86,30 @@ The script will:
 3. Create a symbolic link in the sites-enabled directory
 4. Test the Nginx configuration
 5. Restart Nginx to apply the changes
+
+### GitHub Secrets Management
+
+1. Run the GitHub secrets management script:
+
+```bash
+npm run github
+```
+
+2. Follow the interactive prompts:
+   - Enter the Repository URL (format: https://github.com/owner/repo)
+   - Enter the APP_ID
+   - Enter the APP_PATH
+
+The script will create the following secrets in your GitHub repository:
+
+- APP_ID
+- APP_PATH
+- SSH_PRIVATE_KEY
+- USERNAME
+- PASSPHRASE (if provided)
+- HOST
+
+The secrets are encrypted using libsodium-wrappers, which is the recommended encryption library for GitHub Actions secrets.
 
 ## Customizing the Nginx Configuration
 
@@ -107,6 +144,7 @@ The project uses the following main dependencies:
 - `ssh2`: For secure SSH connections to the server
 - `readline`: For interactive command-line interface
 - `zod`: For runtime type checking and validation
+- `tweetsodium`: For GitHub secrets encryption
 
 ## Generated Nginx Configuration
 
@@ -141,6 +179,7 @@ server {
 - Ensure your SSH private key has appropriate permissions (600)
 - Use strong passphrases for your SSH keys
 - Regularly update your server's security settings
+- Use a GitHub Personal Access Token with minimal required permissions for secrets management
 
 ## Error Handling
 
@@ -150,6 +189,8 @@ The script includes error handling for:
 - Missing SSH keys
 - Nginx configuration errors
 - Command execution failures
+- GitHub API errors
+- Secret encryption failures
 
 ## Contributing
 

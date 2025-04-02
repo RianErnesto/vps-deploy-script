@@ -1,40 +1,13 @@
-const readline = require("readline");
 const { Client } = require("ssh2");
 const path = require("path");
 const { env } = require("./config/env.config");
 const { getPrivateKey } = require("./utils/ssh.utils");
 const { processTemplate } = require("./utils/templates.utils");
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-function question(query) {
-  return new Promise((resolve) => {
-    rl.question(query, (question) => {
-      resolve(question);
-    });
-  });
-}
-
-async function checkAccessServerWilling() {
-  const accessServer = await question(
-    "Do you want to access the server? (yes/no): "
-  );
-
-  if (accessServer.toLowerCase() !== "yes") {
-    console.log("Script finished by user.");
-    rl.close();
-    process.exit(0);
-  }
-}
+const { question, close } = require("./libs/readline/utils");
 
 async function main() {
   try {
     console.log("NGINX Automatic Configuration Script...");
-
-    await checkAccessServerWilling();
 
     const privateKey = await getPrivateKey();
 
@@ -117,12 +90,12 @@ async function main() {
         conn.end();
       }
 
-      rl.close();
+      close();
     });
 
     conn.on("error", (err) => {
       console.error("SSH Connection error: ", err.message);
-      rl.close();
+      close();
     });
 
     conn.connect({

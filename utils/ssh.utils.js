@@ -1,4 +1,8 @@
-export async function getPrivateKey() {
+const path = require("path");
+const { env } = require("../config/env.config");
+const fs = require("fs");
+
+async function getPrivateKey() {
   const privateKeyPath = path.join(
     process.env.HOME || process.env.USERPROFILE,
     ".ssh",
@@ -17,3 +21,7 @@ export async function getPrivateKey() {
 
   return privateKey;
 }
+
+module.exports = {
+  getPrivateKey,
+};
