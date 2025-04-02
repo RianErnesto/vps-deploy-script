@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "nginx": "node --env-file=.env nginx.index.js",
-    "github": "node --env-file=.env github.index.js"
+    "github": "node --env-file=.env github.index.js",
+    "pm2": "node --env-file=.env pm2.index.js"
   },
   "keywords": [],
   "author": "",

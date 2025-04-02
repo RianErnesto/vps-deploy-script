@@ -1,30 +1,70 @@
-# Nginx Configuration Script
+# Deployment Scripts
 
-This script automates the process of configuring Nginx on a remote server for reverse proxy setup. It allows you to easily create Nginx configurations for different domains and ports, making it perfect for managing multiple web applications on the same server.
+A collection of scripts to automate the deployment of Node.js applications, from server configuration to application deployment.
 
-## Features
+## Scripts Overview
 
-- Interactive command-line interface
-- Secure SSH connection using private key authentication
-- Automatic Nginx configuration file creation
-- Support for WebSocket connections
-- Automatic Nginx configuration testing and restart
-- Support for both HTTP and HTTPS (port 80)
-- Template-based configuration for easy customization
-- GitHub repository secrets management using libsodium-wrappers for secure encryption
+### 1. PM2 Deployment Script (`pm2.index.js`)
+
+Automates the deployment of Node.js applications using PM2 process manager.
+
+**Features:**
+
+- Automatic port management
+- Environment variables handling
+- PM2 ecosystem file management
+- Backup and restore functionality
+- Input validation using Zod
+
+**Usage:**
+
+```bash
+npm run pm2
+```
+
+### 2. Nginx Configuration Script (`nginx.index.js`)
+
+Manages Nginx server configurations for reverse proxy setup.
+
+**Features:**
+
+- Virtual host configuration
+- WebSocket support
+- Automatic configuration testing
+- Template-based configuration
+
+**Usage:**
+
+```bash
+npm run nginx
+```
+
+### 3. GitHub Configuration Script (`github.index.js`)
+
+Handles GitHub repository setup and deployment configurations.
+
+**Features:**
+
+- Repository secrets management
+- Webhook configuration
+- Deployment keys setup
+- Secure encryption using libsodium-wrappers
+
+**Usage:**
+
+```bash
+npm run github
+```
 
 ## Prerequisites
 
-- Node.js installed on your local machine
-- SSH access to the target server
-- Nginx installed on the target server
-- Sudo privileges on the target server
-- SSH private key for authentication
-- GitHub Personal Access Token (for secrets management)
+- Node.js installed
+- SSH access to target server
+- Proper server permissions
 
 ## Installation
 
-1. Clone this repository:
+1. Clone the repository:
 
 ```bash
 git clone <repository-url>
@@ -37,160 +77,64 @@ cd <repository-name>
 npm install
 ```
 
-3. Copy the example environment file and configure it:
+3. Configure environment:
 
 ```bash
 cp .env.example .env
 ```
 
-4. Edit the `.env` file with your server details:
+4. Edit `.env` with your settings:
 
 ```env
-SERVER_IP_ADDRESS="your_server_ip"
-USER_SSH="your_ssh_username"
-SSH_PRIVATE_KEY="your_private_key_name"
-# Optional: SSH_PASSPHRASE="your_key_passphrase"
-# Optional: GITHUB_TOKEN="your_github_personal_access_token"
-```
-
-Make sure your SSH private key is located in the `~/.ssh/` directory.
-
-## Dependencies
-
-The project uses the following main dependencies:
-
-- `libsodium-wrappers`: For secure encryption of GitHub secrets
-- `ssh2`: For SSH connection handling
-- `readline`: For interactive command-line interface
-- `zod`: For environment variable validation
-
-## Usage
-
-### Nginx Configuration
-
-1. Run the script using npm:
-
-```bash
-npm run nginx
-```
-
-2. Follow the interactive prompts:
-   - Enter client name (used for the configuration filename)
-   - Enter domain name
-   - Enter port number where your application is running
-
-The script will:
-
-1. Connect to your server via SSH
-2. Create a new Nginx configuration file
-3. Create a symbolic link in the sites-enabled directory
-4. Test the Nginx configuration
-5. Restart Nginx to apply the changes
-
-### GitHub Secrets Management
-
-1. Run the GitHub secrets management script:
-
-```bash
-npm run github
-```
-
-2. Follow the interactive prompts:
-   - Enter the Repository URL (format: https://github.com/owner/repo)
-   - Enter the APP_ID
-   - Enter the APP_PATH
-
-The script will create the following secrets in your GitHub repository:
-
-- APP_ID
-- APP_PATH
-- SSH_PRIVATE_KEY
-- USERNAME
-- PASSPHRASE (if provided)
-- HOST
-
-The secrets are encrypted using libsodium-wrappers, which is the recommended encryption library for GitHub Actions secrets.
-
-## Customizing the Nginx Configuration
-
-The Nginx configuration is now template-based, making it easier to modify. The template file is located at `templates/nginx.config.template`. You can modify this file to change the default configuration.
-
-Available template variables:
-
-- `{{domain}}`: The domain name for the site
-- `{{port}}`: The port number where your application is running
-
-Example of modifying the template:
-
-```nginx
-server {
-    listen 80;
-    server_name {{domain}} www.{{domain}};
-    location / {
-        proxy_pass http://localhost:{{port}};
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
+SERVER_IP_ADDRESS=your_server_ip
+USER_SSH=your_ssh_username
+SSH_PRIVATE_KEY=your_private_key_name
+# Optional: SSH_PASSPHRASE=your_key_passphrase
+# Optional: GITHUB_TOKEN=your_github_token
 ```
 
 ## Dependencies
 
-The project uses the following main dependencies:
+- `ssh2`: SSH connection handling
+- `readline`: Interactive CLI
+- `zod`: Runtime validation
+- `libsodium-wrappers`: Secure encryption
 
-- `ssh2`: For secure SSH connections to the server
-- `readline`: For interactive command-line interface
-- `zod`: For runtime type checking and validation
-- `tweetsodium`: For GitHub secrets encryption
+## Deployment Workflow
 
-## Generated Nginx Configuration
+1. **Server Setup** (Nginx Script)
 
-The script generates a Nginx configuration that:
+   - Configure reverse proxy
+   - Configure virtual hosts
 
-- Listens on port 80
-- Supports both www and non-www domains
-- Includes WebSocket support
-- Sets up proper proxy headers
-- Uses localhost for the backend connection
+2. **Repository Setup** (GitHub Script)
 
-Example configuration:
+   - Configure repository secrets
+   - Set up deployment keys
+   - Configure webhooks
 
-```nginx
-server {
-    listen 80;
-    server_name example.com www.example.com;
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
+3. **Application Deployment** (PM2 Script)
+   - Deploy application
+   - Configure environment variables
+   - Manage process with PM2
 
 ## Security Considerations
 
-- Keep your `.env` file secure and never commit it to version control
-- Ensure your SSH private key has appropriate permissions (600)
-- Use strong passphrases for your SSH keys
-- Regularly update your server's security settings
-- Use a GitHub Personal Access Token with minimal required permissions for secrets management
+- Keep `.env` file secure
+- Use strong SSH key passphrases
+- Regular server security updates
+- Minimal GitHub token permissions
+- Proper file permissions (600 for SSH keys)
 
 ## Error Handling
 
-The script includes error handling for:
+All scripts include comprehensive error handling:
 
 - SSH connection failures
-- Missing SSH keys
-- Nginx configuration errors
-- Command execution failures
-- GitHub API errors
-- Secret encryption failures
+- Configuration errors
+- Permission issues
+- Validation errors
+- Backup and restore functionality
 
 ## Contributing
 
